@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulation Launcher</title>
+  <style>
+    :root {
+      --bg: #f3f5f8;
+      --card-bg: #ffffff;
+      --navy-heading: #1e3a5f;
+      --callout-bg: #e0f2fe;
+      --callout-text: #0369a1;
+      --btn-blue: #2980b9;
+      --btn-blue-hover: #1f6696;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    /* Outer Card */
+    .container-card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 36px 32px 32px;
+      width: 100%;
+      max-width: 520px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      text-align: center;
+    }
+
+    .card-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--navy-heading);
+      margin-bottom: 22px;
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+    }
+
+    /* Light Blue Instruction Callout */
+    .callout-box {
+      background-color: var(--callout-bg);
+      color: var(--callout-text);
+      font-weight: 700;
+      font-size: 15px;
+      line-height: 1.45;
+      padding: 16px 20px;
+      border-radius: 12px;
+      margin-bottom: 22px;
+    }
+
+    /* Full-Width Launch Button */
+    .app-btn {
+      width: 100%;
+      border: none;
+      outline: none;
+      padding: 16px 20px;
+      border-radius: 12px;
+      background-color: var(--btn-blue);
+      color: #ffffff;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.15s ease-in-out;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+    }
+
+    .app-btn:hover {
+      background-color: var(--btn-blue-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px -2px rgba(0, 0, 0, 0.14);
+    }
+
+    .app-btn:active {
+      transform: translateY(0);
+    }
+
+    .app-btn svg {
+      width: 19px;
+      height: 19px;
+      stroke-width: 2.2;
+    }
+
+    @media (max-width: 520px) {
+      .container-card {
+        padding: 28px 20px;
+      }
+      .card-title {
+        font-size: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container-card">
+    <h1 class="card-title" id="labTitle">Specific Heat Capacity Simulator</h1>
+    
+    <div class="callout-box" id="instructionBox">
+      Launch the interactive simulation below in a dedicated workspace window.
+    </div>
+
+    <button class="app-btn" onclick="launchDedicatedWindow()">
+      <!-- Pop-out Window Icon -->
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+        <polyline points="15 3 21 3 21 9"></polyline>
+        <line x1="10" y1="14" x2="21" y2="3"></line>
+      </svg>
+      <span>Launch Simulator</span>
+    </button>
+  </div>
+
+  <script>
+    // 1. BUILT-IN PRESETS (Add or edit shortcuts as needed)
+    const PRESETS = {
+      "specificheat": {
+        title: "Heating Curve Lab",
+        url: "https://teacherbrothen.github.io/HeatingCurve",
+        callout: "Launch the interactive simulation below in a dedicated workspace window."
+      },
+     
+    };
+
+    // 2. READ QUERY PARAMETERS
+    const params = new URLSearchParams(window.location.search);
+    const labPresetKey = params.get('lab') ? params.get('lab').toLowerCase() : 'specificheat';
+    const config = PRESETS[labPresetKey] || PRESETS['specificheat'];
+
+    // Overrides via URL parameters (?title=...&url=...&callout=...)
+    const targetUrl = params.get('url') || config.url;
+    const title = params.get('title') || config.title;
+    const callout = params.get('callout') || config.callout;
+
+    // Apply text to the UI
+    document.title = title;
+    document.getElementById('labTitle').innerText = title;
+    document.getElementById('instructionBox').innerText = callout;
+
+    // 3. CENTERING & POP-OUT WINDOW LOGIC
+    function launchDedicatedWindow() {
+      const w = 1180;
+      const h = 800;
+      const left = Math.max(0, (window.screen.width - w) / 2);
+      const top = Math.max(0, (window.screen.height - h) / 2);
+
+      const features = `width=${w},height=${h},top=${top},left=${left},resizable=yes,scrollbars=yes,status=no,toolbar=no,menubar=no,location=no`;
+      const win = window.open(targetUrl, "SimWorkspaceWindow", features);
+
+      if (win) {
+        win.focus();
+      } else {
+        // Fallback if the browser popup blocker interferes
+        window.open(targetUrl, "_blank");
+      }
+    }
+  </script>
+</body>
+</html>
